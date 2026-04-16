@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calabria 2026 - L'Avventura del Sud</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --sun: #FF6B35;
+            --sea: #0EA5E9;
+            --olive: #65A30D;
+            --wine: #9F1239;
+            --sand: #F5E6D3;
+            --night: #0F172A;
+            --peperoncino: #DC2626;
+            --gold: #F59E0B;
+            --bg: #FFFBF5;
+            --card: #FFFFFF;
+            --text: #1E293B;
+            --muted: #64748B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('Foto Calabria/tropea_01.jpg') center/cover no-repeat;
+            filter: brightness(0.6);
+            transform: scale(1.1);
+            animation: heroZoom 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroZoom {
+            from { transform: scale(1.1); }
+            to { transform: scale(1.0); }
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(15,23,42,0.3) 0%,
+                rgba(15,23,42,0.1) 40%,
+                rgba(15,23,42,0.6) 80%,
+                rgba(15,23,42,0.95) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 16px;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-title span {
+            display: block;
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1rem, 3vw, 1.6rem);
+            font-weight: 300;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-top: 12px;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-weight: 300;
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--sun);
+            color: white;
+            text-decoration: none;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            animation: fadeInUp 1s ease-out 0.6s both;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hero-cta:hover {
+            background: #E55A2B;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,107,53,0.4);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator svg {
+            width: 30px;
+            height: 30px;
+            stroke: white;
+            opacity: 0.6;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 40px 20px;
+            background: var(--night);
+            color: white;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 14px 24px;
+            transition: all 0.3s;
+        }
+
+        .stat-chip:hover {
+            background: rgba(255,255,255,0.14);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .stat-info { display: flex; flex-direction: column; }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--sun);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            color: var(--night);
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* ===== FAMIGLIE (CREW) ===== */
+        .crew-section {
+            background: linear-gradient(180deg, var(--night) 0%, #1E293B 100%);
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .crew-section .section-tag { color: var(--gold); }
+        .crew-section .section-title { color: white; }
+        .crew-section .section-desc { color: rgba(255,255,255,0.6); }
+
+        .families-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .family-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 36px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .family-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .family-card:nth-child(1)::before { background: var(--sun); }
+        .family-card:nth-child(2)::before { background: var(--sea); }
+        .family-card:nth-child(3)::before { background: var(--olive); }
+
+        .family-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .family-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+
+        .family-transport {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .family-photo {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .family-members {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .member {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .member-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+        }
+
+        .member-info { flex: 1; }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .member-role {
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .member-badge {
+            font-size: 0.7rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge-adult { background: rgba(14,165,233,0.2); color: #38BDF8; }
+        .badge-kid { background: rgba(245,158,11,0.2); color: #FBBF24; }
+
+        /* ===== PERSONAGGI ===== */
+        .personaggi-section {
+            padding: 80px 20px;
+            background: linear-gradient(180deg, #FFFBEB 0%, #FEF3C7 50%, #FFFBEB 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .personaggi-section .section-tag { color: var(--wine); }
+
+        .personaggi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .persona-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .persona-card:hover {
+            transform: translateY(-6px) rotate(-0.5deg);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+        }
+
+        .persona-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 24px 24px 0;
+        }
+
+        .persona-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .persona-card:nth-child(1) .persona-avatar { border: 3px solid var(--gold); }
+        .persona-card:nth-child(2) .persona-avatar { border: 3px solid #EC4899; }
+        .persona-card:nth-child(3) .persona-avatar { border: 3px solid #1D4ED8; }
+        .persona-card:nth-child(4) .persona-avatar { border: 3px solid #10B981; }
+        .persona-card:nth-child(5) .persona-avatar { border: 3px solid var(--peperoncino); }
+        .persona-card:nth-child(6) .persona-avatar { border: 3px solid var(--sea); }
+
+        .persona-name-wrap h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .persona-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 2px;
+        }
+
+        .persona-body {
+            padding: 18px 24px 24px;
+        }
+
+        .persona-quote {
+            font-style: italic;
+            font-size: 0.92rem;
+            color: var(--muted);
+            line-height: 1.5;
+            padding: 12px 16px;
+            background: #F8FAFC;
+            border-left: 3px solid;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 14px;
+        }
+
+        .persona-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .persona-trait {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .persona-superpower {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        /* ===== VIAGGIO SECTION ===== */
+        .viaggio-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viaggio-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 120%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 60px,
+                rgba(255,255,255,0.015) 60px,
+                rgba(255,255,255,0.015) 61px
+            );
+            transform: skewY(-5deg);
+        }
+
+        .viaggio-section .section-tag { color: var(--gold); }
+        .viaggio-section .section-title { color: white; }
+        .viaggio-section .section-desc { color: rgba(255,255,255,0.6); }
+
+        .viaggio-road {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* animated road line */
+        .viaggio-road::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: repeating-linear-gradient(
+                180deg,
+                var(--gold) 0px,
+                var(--gold) 12px,
+                transparent 12px,
+                transparent 24px
+            );
+            border-radius: 4px;
+            opacity: 0.4;
+            transform: translateX(-50%);
+        }
+
+        .viaggio-card {
+            position: relative;
+            width: 45%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 32px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+            margin-bottom: 40px;
+        }
+
+        .viaggio-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .viaggio-card:nth-child(odd) { margin-left: 0; }
+        .viaggio-card:nth-child(even) { margin-left: auto; }
+
+        .viaggio-card::after {
+            content: '';
+            position: absolute;
+            top: 36px;
+            width: 16px;
+            height: 16px;
+            background: var(--gold);
+            border-radius: 50%;
+            border: 3px solid #1E293B;
+            z-index: 2;
+        }
+
+        .viaggio-card:nth-child(odd)::after { right: -8%; left: auto; transform: translateX(50%); }
+        .viaggio-card:nth-child(even)::after { left: -8%; transform: translateX(-50%); }
+
+        .viaggio-vehicle {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .viaggio-vehicle-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .viaggio-vehicle-info h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .viaggio-vehicle-info p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .viaggio-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .viaggio-detail {
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .viaggio-detail-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.4;
+            margin-bottom: 4px;
+        }
+
+        .viaggio-detail-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .viaggio-route-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .viaggio-passengers {
+            display: flex;
+            gap: -8px;
+            margin-top: 14px;
+        }
+
+        .viaggio-passengers img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #1E293B;
+            object-fit: cover;
+            margin-left: -8px;
+        }
+
+        .viaggio-passengers img:first-child { margin-left: 0; }
+
+        .viaggio-fun-fact {
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: rgba(245,158,11,0.1);
+            border-left: 3px solid var(--gold);
+            border-radius: 0 10px 10px 0;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .viaggio-road::before { left: 20px; }
+            .viaggio-card { width: 85%; margin-left: 50px !important; }
+            .viaggio-card::after { left: -30px !important; right: auto !important; transform: none !important; }
+            .viaggio-detail-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== DAILY ROUTINE TIMELINE ===== */
+        .routine-section {
+            background: linear-gradient(180deg, #F8FAFC 0%, var(--bg) 100%);
+            padding: 80px 20px;
+        }
+
+        .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 28px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--gold), var(--sun), var(--peperoncino), var(--wine), var(--sea), var(--night));
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 28px;
+            margin-bottom: 10px;
+            position: relative;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.15s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.25s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(6) { animation-delay: 0.35s; }
+        .timeline-item:nth-child(7) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(8) { animation-delay: 0.45s; }
+        .timeline-item:nth-child(9) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(10) { animation-delay: 0.55s; }
+        .timeline-item:nth-child(11) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(12) { animation-delay: 0.65s; }
+        .timeline-item:nth-child(13) { animation-delay: 0.7s; }
+
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-dot {
+            width: 56px;
+            min-width: 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 18px;
+        }
+
+        .dot-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 0 5px var(--bg);
+        }
+
+        .timeline-card {
+            flex: 1;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 22px 26px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .timeline-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .timeline-time {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--sun);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin: 4px 0;
+        }
+
+        .timeline-desc {
+            font-size: 0.88rem;
+            color: var(--muted);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .timeline-mood {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            padding: 3px 12px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        /* ===== FIGHT CLUB ===== */
+        .fight-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #1C1917 0%, #292524 50%, #1C1917 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fight-section::before {
+            content: 'VS';
+            position: absolute;
+            font-size: clamp(15rem, 30vw, 40rem);
+            font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+            color: rgba(255,255,255,0.02);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .fight-section .section-tag { color: #EF4444; }
+        .fight-section .section-title { color: white; }
+        .fight-section .section-desc { color: rgba(255,255,255,0.5); }
+
+        .fighters-ring {
+            max-width: 900px;
+            margin: 0 auto 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .fighter-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 28px 24px;
+            text-align: center;
+            width: 220px;
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .fighter-card:hover {
+            transform: scale(1.05) rotate(-1deg);
+            border-color: #EF4444;
+            background: rgba(239,68,68,0.08);
+        }
+
+        .fighter-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #EF4444;
+            margin-bottom: 14px;
+        }
+
+        .fighter-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .fighter-alias {
+            font-size: 0.78rem;
+            color: #EF4444;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .fighter-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .fighter-stat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+        }
+
+        .fighter-stat-label { opacity: 0.5; }
+
+        .fighter-stat-bar {
+            width: 80px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .fighter-stat-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #EF4444, #F59E0B);
+        }
+
+        .vs-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(239,68,68,0.4);
+            animation: vsPulse 2s infinite;
+        }
+
+        @keyframes vsPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(239,68,68,0.3); transform: scale(1); }
+            50% { box-shadow: 0 0 40px rgba(239,68,68,0.6); transform: scale(1.1); }
+        }
+
+        .fight-scenes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto 40px;
+        }
+
+        .fight-scene-card {
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/10;
+            transition: all 0.4s;
+        }
+
+        .fight-scene-card:hover {
+            transform: scale(1.03);
+        }
+
+        .fight-scene-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .fight-scene-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 50%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+
+        .fight-scene-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .fight-scene-desc {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        .fight-rules {
+            max-width: 700px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+        }
+
+        .fight-rule {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .fight-rule-icon {
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .fighters-ring { flex-direction: column; }
+            .vs-badge { width: 40px; height: 40px; font-size: 0.9rem; }
+            .fighter-card { width: 100%; max-width: 280px; }
+        }
+
+        /* ===== GALLERY ===== */
+        .gallery-section {
+            background: var(--night);
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .gallery-section .section-tag { color: var(--gold); }
+        .gallery-section .section-title { color: white; }
+        .gallery-section .section-desc { color: rgba(255,255,255,0.6); }
+
+        .gallery-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .gallery-tab {
+            padding: 10px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gallery-tab:hover, .gallery-tab.active {
+            background: var(--sun);
+            border-color: var(--sun);
+            color: white;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .gallery-item:nth-child(1),
+        .gallery-item:nth-child(6) {
+            grid-column: span 2;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.08);
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item-label {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* ===== FOOD SECTION ===== */
+        .food-section {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FECACA 50%, #FED7AA 100%);
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-section::before {
+            content: '🌶️';
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.07;
+            top: -40px;
+            right: -40px;
+            transform: rotate(15deg);
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px) rotate(-1deg);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .food-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .food-card-body {
+            padding: 16px;
+            text-align: center;
+        }
+
+        .food-card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .food-card-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .food-spicy {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* ===== MAP ===== */
+        .map-section {
+            padding: 80px 20px;
+            background: #F1F5F9;
+        }
+
+        #map {
+            height: 450px;
+            border-radius: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        /* ===== RESORT INFO ===== */
+        .resort-section {
+            padding: 80px 20px;
+            background: linear-gradient(180deg, var(--bg) 0%, #E0F2FE 100%);
+        }
+
+        .resort-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .resort-img {
+            background: url('Foto Villaggio/caption.jpg') center/cover no-repeat;
+            min-height: 350px;
+        }
+
+        .resort-info {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .resort-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: var(--night);
+        }
+
+        .resort-location {
+            color: var(--sea);
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .resort-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .resort-features li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .resort-features li span {
+            font-size: 1.2rem;
+        }
+
+        /* ===== COUNTDOWN / QUOTE ===== */
+        .quote-section {
+            background: var(--night);
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255,107,53,0.15) 0%, transparent 70%);
+        }
+
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-style: italic;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .countdown-item {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 20px 28px;
+            min-width: 90px;
+        }
+
+        .countdown-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--sun);
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.5;
+        }
+
+        /* ===== EXPLORE / CONSIGLI ===== */
+        .explore-section {
+            padding: 80px 20px;
+            background: linear-gradient(180deg, var(--bg) 0%, #F0FDF4 50%, #ECFDF5 100%);
+        }
+
+        .explore-filters {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .explore-filter {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: 2px solid #E2E8F0;
+            background: white;
+            color: var(--muted);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .explore-filter:hover, .explore-filter.active {
+            border-color: var(--olive);
+            background: var(--olive);
+            color: white;
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .place-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: all 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .place-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        .place-card-img {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .place-card-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 50%);
+        }
+
+        .place-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 1;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-spiaggia { background: rgba(14,165,233,0.9); color: white; }
+        .badge-borgo { background: rgba(159,18,57,0.9); color: white; }
+        .badge-natura { background: rgba(101,163,13,0.9); color: white; }
+        .badge-cultura { background: rgba(245,158,11,0.9); color: white; }
+        .badge-avventura { background: rgba(124,58,237,0.9); color: white; }
+
+        .place-distance {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            z-index: 1;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+        }
+
+        .place-card-body {
+            padding: 20px 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .place-card-title {
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+            color: var(--night);
+        }
+
+        .place-card-desc {
+            font-size: 0.88rem;
+            color: var(--muted);
+            line-height: 1.55;
+            flex: 1;
+        }
+
+        .place-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #F1F5F9;
+        }
+
+        .place-rating {
+            font-size: 0.85rem;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .place-maps-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 16px;
+            border-radius: 10px;
+            background: #F1F5F9;
+            color: var(--sea);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .place-maps-btn:hover {
+            background: var(--sea);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .explore-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #0B1120;
+            padding: 40px 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.85rem;
+        }
+
+        footer .footer-icons {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            letter-spacing: 8px;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15,23,42,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            z-index: 100;
+            padding: 0;
+        }
+
+        .bottom-nav a {
+            flex: 1;
+            max-width: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 8px;
+            color: rgba(255,255,255,0.5);
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav a:hover, .bottom-nav a.active {
+            color: var(--sun);
+        }
+
+        .bottom-nav a span { font-size: 1.3rem; }
+
+        body { padding-bottom: 70px; }
+
+        /* ===== LIGHTBOX ===== */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .lightbox.open { display: flex; }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .families-grid { grid-template-columns: 1fr; }
+            .resort-card { grid-template-columns: 1fr; }
+            .resort-img { min-height: 220px; }
+            .gallery-item:nth-child(1),
+            .gallery-item:nth-child(6) { grid-column: span 1; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .countdown { gap: 10px; }
+            .countdown-item { padding: 14px 18px; min-width: 70px; }
+            .countdown-value { font-size: 1.8rem; }
+            .timeline::before { left: 20px; }
+            .timeline-dot { width: 40px; min-width: 40px; }
+            .dot-icon { width: 34px; height: 34px; font-size: 0.9rem; }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid { grid-template-columns: 1fr; }
+            .food-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO -->
+    <section class="hero" id="top">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">☀️ 18 - 25 Luglio 2026</div>
+            <h1 class="hero-title">
+                Calabria
+                <span>3 Famiglie &bull; 7 Giorni &bull; 0 Pensieri</span>
+            </h1>
+            <p class="hero-subtitle">
+                Un'avventura epica tra mare cristallino, cibo da urlo, bambini impazziti e genitori in modalità relax totale
+            </p>
+            <a href="#crew" class="hero-cta">Scopri il Viaggio ↓</a>
+        </div>
+        <div class="scroll-indicator">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stat-chip">
+            <span class="stat-icon">👨‍👩‍👧</span>
+            <div class="stat-info">
+                <span class="stat-value">3</span>
+                <span class="stat-label">Famiglie</span>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-icon">👶</span>
+            <div class="stat-info">
+                <span class="stat-value">3</span>
+                <span class="stat-label">Bambini Scatenati</span>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-icon">🏖️</span>
+            <div class="stat-info">
+                <span class="stat-value">7</span>
+                <span class="stat-label">Giorni di Mare</span>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-icon">🍝</span>
+            <div class="stat-info">
+                <span class="stat-value">21+</span>
+                <span class="stat-label">Pasti Epici</span>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-icon">🌶️</span>
+            <div class="stat-info">
+                <span class="stat-value">∞</span>
+                <span class="stat-label">Peperoncini</span>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <span class="stat-icon">🚗</span>
+            <div class="stat-info">
+                <span class="stat-value">~500</span>
+                <span class="stat-label">Km da Roma</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREW -->
+    <section class="crew-section" id="crew">
+        <div class="section-header reveal">
+            <span class="section-tag">La Ciurma</span>
+            <h2 class="section-title">Le Famiglie</h2>
+            <p class="section-desc">Tre famiglie, nove anime coraggiose, un'unica missione: sopravvivere a 7 giorni in Calabria</p>
+        </div>
+        <div class="families-grid">
+            <!-- Famiglia Allegro -->
+            <div class="family-card reveal">
+                <h3 class="family-name">Famiglia Allegro</h3>
+                <div class="family-transport">🚗 Opel Mokka X Grigia &bull; Roma Borghesiana → Simeri &bull; 06:00 - 14:00</div>
+                <img class="family-photo" src="Foto Persone/Famiglia Allegro.jpg" alt="Famiglia Allegro">
+                <div class="family-members">
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Giuseppe Allegro.jpg" alt="Giuseppe">
+                        <div class="member-info">
+                            <div class="member-name">Giuseppe Allegro</div>
+                            <div class="member-role">L'Essere Umano Perfetto</div>
+                        </div>
+                        <span class="member-badge badge-adult">Papà</span>
+                    </div>
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Sonia Amato.jpg" alt="Sonia">
+                        <div class="member-info">
+                            <div class="member-name">Sonia Amato</div>
+                            <div class="member-role">Regina dello Shopping Compulsivo</div>
+                        </div>
+                        <span class="member-badge badge-adult">Mamma</span>
+                    </div>
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Ilenia Alllegro.jpg" alt="Ilenia">
+                        <div class="member-info">
+                            <div class="member-name">Ilenia Allegro</div>
+                            <div class="member-role">Principessa del Caos</div>
+                        </div>
+                        <span class="member-badge badge-kid">Bimba</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Famiglia Lauri -->
+            <div class="family-card reveal">
+                <h3 class="family-name">Famiglia Lauri</h3>
+                <div class="family-transport">🚗 Renault Kadjar Nera &bull; Roma Borghesiana → Simeri &bull; 06:00 - 14:00</div>
+                <img class="family-photo" src="Foto Persone/Famiglia Lauri.jpg" alt="Famiglia Lauri">
+                <div class="family-members">
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Tiziano Lauri.jpg" alt="Tiziano">
+                        <div class="member-info">
+                            <div class="member-name">Tiziano Lauri</div>
+                            <div class="member-role">Il Generale &bull; Amico di Vannacci</div>
+                        </div>
+                        <span class="member-badge badge-adult">Papà</span>
+                    </div>
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Teresa Perone.jpg" alt="Teresa">
+                        <div class="member-info">
+                            <div class="member-name">Teresa Perone</div>
+                            <div class="member-role">Maniaca della Pulizia</div>
+                        </div>
+                        <span class="member-badge badge-adult">Mamma</span>
+                    </div>
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Gaia Lauri.jpg" alt="Gaia">
+                        <div class="member-info">
+                            <div class="member-name">Gaia Lauri</div>
+                            <div class="member-role">Tornado Biondo</div>
+                        </div>
+                        <span class="member-badge badge-kid">Bimba</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Famiglia Fanelli -->
+            <div class="family-card reveal">
+                <h3 class="family-name">Famiglia Fanelli</h3>
+                <div class="family-transport">🚆 Intercity Roma Termini → Catanzaro Lido &bull; Alessio reduce da matrimonio!</div>
+                <img class="family-photo" src="Foto Persone/Famiglia Fanelli.jpg" alt="Famiglia Fanelli">
+                <div class="family-members">
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Alessio Fanelli.jpg" alt="Alessio">
+                        <div class="member-info">
+                            <div class="member-name">Alessio Fanelli</div>
+                            <div class="member-role">L'Ipocondriaco &bull; Reduce da Matrimonio</div>
+                        </div>
+                        <span class="member-badge badge-adult">Papà</span>
+                    </div>
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Sara Stirpe.jpg" alt="Sara">
+                        <div class="member-info">
+                            <div class="member-name">Sara Stirpe</div>
+                            <div class="member-role">La Rappresentante di Classe</div>
+                        </div>
+                        <span class="member-badge badge-adult">Mamma</span>
+                    </div>
+                    <div class="member">
+                        <img class="member-avatar" src="Foto Persone/Matteo Fanelli.jpg" alt="Matteo">
+                        <div class="member-info">
+                            <div class="member-name">Matteo Fanelli</div>
+                            <div class="member-role">Piccolo Terremoto</div>
+                        </div>
+                        <span class="member-badge badge-kid">Bimbo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- I PERSONAGGI -->
+    <section class="personaggi-section" id="personaggi">
+        <div class="section-header reveal">
+            <span class="section-tag">I Protagonisti</span>
+            <h2 class="section-title">Chi Sono Davvero</h2>
+            <p class="section-desc">Dietro ogni famiglia si nascondono personalita' uniche, straordinarie e... discutibili</p>
+        </div>
+        <div class="personaggi-grid">
+
+            <!-- Giuseppe -->
+            <div class="persona-card reveal">
+                <div class="persona-header">
+                    <img class="persona-avatar" src="Foto Persone/Giuseppe Allegro.jpg" alt="Giuseppe">
+                    <div class="persona-name-wrap">
+                        <h4>Giuseppe Allegro</h4>
+                        <div class="persona-title" style="color:var(--gold);">L'Essere Umano Perfetto</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="persona-quote" style="border-color:var(--gold);">
+                        "Non e' che ho sempre ragione. E' che gli altri hanno sempre torto. C'e' una sottile differenza."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="persona-trait" style="background:#FEF3C7; color:#A16207;">Ha sempre ragione</span>
+                        <span class="persona-trait" style="background:#FEF3C7; color:#A16207;">Mai un errore</span>
+                        <span class="persona-trait" style="background:#FEF3C7; color:#A16207;">Umilissimo</span>
+                        <span class="persona-trait" style="background:#FEF3C7; color:#A16207;">Modesto</span>
+                    </div>
+                    <div class="persona-superpower" style="background:#FFFBEB;">
+                        🏆 <b>Superpotere:</b>&nbsp;Avere ragione anche quando ha palesemente torto. Nessuno riesce a contraddirlo perche'... beh, ha ragione.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sonia -->
+            <div class="persona-card reveal">
+                <div class="persona-header">
+                    <img class="persona-avatar" src="Foto Persone/Sonia Amato.jpg" alt="Sonia">
+                    <div class="persona-name-wrap">
+                        <h4>Sonia Amato</h4>
+                        <div class="persona-title" style="color:#EC4899;">Regina dello Shopping</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="persona-quote" style="border-color:#EC4899;">
+                        "E' in offerta, non posso NON comprarlo. Sarebbe da irresponsabili non approfittarne."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="persona-trait" style="background:#FCE7F3; color:#9D174D;">Action addicted</span>
+                        <span class="persona-trait" style="background:#FCE7F3; color:#9D174D;">Cose inutili utili</span>
+                        <span class="persona-trait" style="background:#FCE7F3; color:#9D174D;">Budget? Quale budget?</span>
+                    </div>
+                    <div class="persona-superpower" style="background:#FDF2F8;">
+                        🛒 <b>Superpotere:</b>&nbsp;Trovare un negozio tipo Action anche nel paesino piu' sperduto della Calabria. Il portabagagli della Mokka X tremera'.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tiziano -->
+            <div class="persona-card reveal">
+                <div class="persona-header">
+                    <img class="persona-avatar" src="Foto Persone/Tiziano Lauri.jpg" alt="Tiziano">
+                    <div class="persona-name-wrap">
+                        <h4>Tiziano Lauri</h4>
+                        <div class="persona-title" style="color:#1D4ED8;">Il Generale</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="persona-quote" style="border-color:#1D4ED8;">
+                        "Lo diceva anche il mio amico Vannacci... la disciplina e' tutto. Anche in spiaggia."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="persona-trait" style="background:#DBEAFE; color:#1E40AF;">Destro convinto</span>
+                        <span class="persona-trait" style="background:#DBEAFE; color:#1E40AF;">Amico di Vannacci</span>
+                        <span class="persona-trait" style="background:#DBEAFE; color:#1E40AF;">Ordine e disciplina</span>
+                    </div>
+                    <div class="persona-superpower" style="background:#EFF6FF;">
+                        🎖️ <b>Superpotere:</b>&nbsp;Trasformare qualsiasi conversazione leggera in un comizio politico nel giro di 3 frasi. Al terzo Amaro del Capo cita Vannacci come fonte accademica.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teresa -->
+            <div class="persona-card reveal">
+                <div class="persona-header">
+                    <img class="persona-avatar" src="Foto Persone/Teresa Perone.jpg" alt="Teresa">
+                    <div class="persona-name-wrap">
+                        <h4>Teresa Perone</h4>
+                        <div class="persona-title" style="color:#10B981;">Maniaca della Pulizia</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="persona-quote" style="border-color:#10B981;">
+                        "Avete toccato la maniglia? Con le MANI? Senza gel? Siete pazzi."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="persona-trait" style="background:#D1FAE5; color:#065F46;">Amuchina always</span>
+                        <span class="persona-trait" style="background:#D1FAE5; color:#065F46;">Panni stesi perfetti</span>
+                        <span class="persona-trait" style="background:#D1FAE5; color:#065F46;">Stanza sterilizzata</span>
+                    </div>
+                    <div class="persona-superpower" style="background:#ECFDF5;">
+                        🧹 <b>Superpotere:</b>&nbsp;Sanificare una camera d'albergo in 4 minuti netti. Arriva con valigia piena di detersivi. Il resort le offrirebbe un contratto.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alessio -->
+            <div class="persona-card reveal">
+                <div class="persona-header">
+                    <img class="persona-avatar" src="Foto Persone/Alessio Fanelli.jpg" alt="Alessio">
+                    <div class="persona-name-wrap">
+                        <h4>Alessio Fanelli</h4>
+                        <div class="persona-title" style="color:var(--peperoncino);">L'Ipocondriaco</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="persona-quote" style="border-color:var(--peperoncino);">
+                        "Ragazzi ho googlato i sintomi... potrebbe essere qualsiasi cosa. Chiamiamo un dottore."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="persona-trait" style="background:#FEE2E2; color:#991B1B;">Google Symptoms Pro</span>
+                        <span class="persona-trait" style="background:#FEE2E2; color:#991B1B;">Farmacia ambulante</span>
+                        <span class="persona-trait" style="background:#FEE2E2; color:#991B1B;">Crema solare 50+++</span>
+                    </div>
+                    <div class="persona-superpower" style="background:#FEF2F2;">
+                        🏥 <b>Superpotere:</b>&nbsp;Diagnosticarsi 7 malattie rare prima di colazione. Ha portato piu' medicinali che vestiti. Il sole calabrese e' il suo nemico giurato.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sara -->
+            <div class="persona-card reveal">
+                <div class="persona-header">
+                    <img class="persona-avatar" src="Foto Persone/Sara Stirpe.jpg" alt="Sara">
+                    <div class="persona-name-wrap">
+                        <h4>Sara Stirpe</h4>
+                        <div class="persona-title" style="color:var(--sea);">La Rappresentante di Classe</div>
+                    </div>
+                </div>
+                <div class="persona-body">
+                    <div class="persona-quote" style="border-color:var(--sea);">
+                        "Allora, ho fatto un gruppo WhatsApp per organizzare le attivita'. Vi mando il sondaggio con Doodle."
+                    </div>
+                    <div class="persona-traits">
+                        <span class="persona-trait" style="background:#E0F2FE; color:#075985;">Organizzatrice nata</span>
+                        <span class="persona-trait" style="background:#E0F2FE; color:#075985;">Gruppi WhatsApp</span>
+                        <span class="persona-trait" style="background:#E0F2FE; color:#075985;">Lista per tutto</span>
+                    </div>
+                    <div class="persona-superpower" style="background:#F0F9FF;">
+                        📋 <b>Superpotere:</b>&nbsp;Organizzare chiunque, dovunque. In vacanza ha gia' creato il gruppo "Calabria 2026 - INFO", "Calabria 2026 - FOTO", e "Calabria 2026 - EMERGENZE".
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- IL VIAGGIO -->
+    <section class="viaggio-section" id="viaggio">
+        <div class="section-header reveal">
+            <span class="section-tag">Il Viaggio</span>
+            <h2 class="section-title">Roma → Calabria</h2>
+            <p class="section-desc">18 Luglio 2026 — Due auto e un treno. Tre famiglie. Un'unica destinazione.</p>
+        </div>
+        <div class="viaggio-road">
+
+            <!-- Auto 1: Allegro -->
+            <div class="viaggio-card reveal">
+                <div class="viaggio-vehicle">
+                    <div class="viaggio-vehicle-icon" style="background:rgba(255,107,53,0.15);">🚗</div>
+                    <div class="viaggio-vehicle-info">
+                        <h4>Opel Mokka X</h4>
+                        <p>Grigia &bull; Famiglia Allegro</p>
+                    </div>
+                </div>
+                <div class="viaggio-detail-grid">
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Partenza</div>
+                        <div class="viaggio-detail-value">Roma Borghesiana</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Arrivo</div>
+                        <div class="viaggio-detail-value">Simeri Mare</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Orario</div>
+                        <div class="viaggio-detail-value">06:00 → 14:00</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Distanza</div>
+                        <div class="viaggio-detail-value">~500 km • 8h</div>
+                    </div>
+                </div>
+                <div class="viaggio-route-tag" style="background:rgba(255,107,53,0.15); color:#FF6B35;">
+                    🛣️ A1 Roma → A2 Salerno → A3 Cosenza → SS106
+                </div>
+                <div class="viaggio-passengers">
+                    <img src="Foto Persone/Giuseppe Allegro.jpg" alt="Giuseppe" title="Giuseppe - Pilota">
+                    <img src="Foto Persone/Sonia Amato.jpg" alt="Sonia" title="Sonia - Co-pilota">
+                    <img src="Foto Persone/Ilenia Alllegro.jpg" alt="Ilenia" title="Ilenia - Passeggera VIP">
+                </div>
+                <div class="viaggio-fun-fact">
+                    💡 Giuseppe al volante della sua Mokka X grigia. Ha pianificato il percorso perfetto perche', ovviamente, ha sempre ragione sul tragitto migliore. Sonia ha gia' individuato 3 outlet lungo l'A3. Ilenia dormira' per i primi 200 km (forse).
+                </div>
+            </div>
+
+            <!-- Auto 2: Lauri -->
+            <div class="viaggio-card reveal">
+                <div class="viaggio-vehicle">
+                    <div class="viaggio-vehicle-icon" style="background:rgba(14,165,233,0.15);">🚗</div>
+                    <div class="viaggio-vehicle-info">
+                        <h4>Renault Kadjar</h4>
+                        <p>Nera &bull; Famiglia Lauri</p>
+                    </div>
+                </div>
+                <div class="viaggio-detail-grid">
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Partenza</div>
+                        <div class="viaggio-detail-value">Roma Borghesiana</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Arrivo</div>
+                        <div class="viaggio-detail-value">Simeri Mare</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Orario</div>
+                        <div class="viaggio-detail-value">06:00 → 14:00</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Distanza</div>
+                        <div class="viaggio-detail-value">~500 km • 8h</div>
+                    </div>
+                </div>
+                <div class="viaggio-route-tag" style="background:rgba(14,165,233,0.15); color:#0EA5E9;">
+                    🛣️ A1 Roma → A2 Salerno → A3 Cosenza → SS106
+                </div>
+                <div class="viaggio-passengers">
+                    <img src="Foto Persone/Tiziano Lauri.jpg" alt="Tiziano" title="Tiziano - Pilota">
+                    <img src="Foto Persone/Teresa Perone.jpg" alt="Teresa" title="Teresa - Co-pilota">
+                    <img src="Foto Persone/Gaia Lauri.jpg" alt="Gaia" title="Gaia - Boss del sedile posteriore">
+                </div>
+                <div class="viaggio-fun-fact">
+                    💡 Tiziano segue la Mokka X di Giuseppe in convoglio. La Kadjar nera e' carica di valigie, giochi e mezzo scaffale di detersivi di Teresa. Tiziano ascolta podcast di geopolitica. Teresa ha sanificato i sedili prima di partire. Gaia comanda dal seggiolino.
+                </div>
+            </div>
+
+            <!-- Treno: Fanelli -->
+            <div class="viaggio-card reveal">
+                <div class="viaggio-vehicle">
+                    <div class="viaggio-vehicle-icon" style="background:rgba(124,58,237,0.15);">🚆</div>
+                    <div class="viaggio-vehicle-info">
+                        <h4>Intercity Trenitalia</h4>
+                        <p>Roma Termini → Catanzaro &bull; Famiglia Fanelli</p>
+                    </div>
+                </div>
+                <div class="viaggio-detail-grid">
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Partenza</div>
+                        <div class="viaggio-detail-value">Roma Termini</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Arrivo</div>
+                        <div class="viaggio-detail-value">Catanzaro Lido</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Treno</div>
+                        <div class="viaggio-detail-value">Intercity ☕</div>
+                    </div>
+                    <div class="viaggio-detail">
+                        <div class="viaggio-detail-label">Motivo</div>
+                        <div class="viaggio-detail-value">Alessio KO 🥴</div>
+                    </div>
+                </div>
+                <div class="viaggio-route-tag" style="background:rgba(124,58,237,0.15); color:#A78BFA;">
+                    🚂 Roma Termini → Napoli → Paola → Catanzaro Lido
+                </div>
+                <div class="viaggio-passengers">
+                    <img src="Foto Persone/Alessio Fanelli.jpg" alt="Alessio" title="Alessio - Reduce da matrimonio">
+                    <img src="Foto Persone/Sara Stirpe.jpg" alt="Sara" title="Sara - La stratega">
+                    <img src="Foto Persone/Matteo Fanelli.jpg" alt="Matteo" title="Matteo - Terremoto sui binari">
+                </div>
+                <div class="viaggio-fun-fact">
+                    💡 Alessio ha un matrimonio il giorno prima e sara' troppo distrutto per guidare. Anzi, e' convinto di avere un colpo di calore, un'insolazione e forse la dengue. Sara ha organizzato il viaggio in treno con precisione militare: posti prenotati, snack divisi per orario, e un gruppo WhatsApp dedicato. Matteo urla "IL TRENO!" per 5 ore consecutive.
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DAILY ROUTINE -->
+    <section class="routine-section" id="routine">
+        <div class="section-header reveal">
+            <span class="section-tag">La Giornata Tipo</span>
+            <h2 class="section-title">Anatomia di una Giornata Perfetta</h2>
+            <p class="section-desc">Ripetere per 7 giorni. Eventuali variazioni: nessuna. Il caos ha i suoi rituali.</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#FEF3C7; color:#D97706;">☀️</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 7:00 - 9:00</div>
+                    <div class="timeline-title">Colazione Calabrese da Campioni</div>
+                    <div class="timeline-desc">Brioche con la granita, cornetti, frutta fresca, caffe' che ti sveglia l'anima. Teresa ha gia' sanificato il tavolo. Alessio controlla che il latte non sia scaduto. Sonia ha comprato 4 tazze souvenir al negozietto del resort. Giuseppe spiega a tutti la tecnica perfetta per spalmare la marmellata. Tiziano commenta il TG.</div>
+                    <span class="timeline-mood" style="background:#FEF9C3; color:#A16207;">😋 Mood: Felicità pura</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#DBEAFE; color:#2563EB;">🎪</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 9:00</div>
+                    <div class="timeline-title">Operazione Sgancio Bambini</div>
+                    <div class="timeline-desc">I tre piccoli terremoti vengono consegnati al servizio di animazione kids. Tanti saluti, zero sensi di colpa. Gli animatori non sanno cosa li aspetta.</div>
+                    <span class="timeline-mood" style="background:#DCFCE7; color:#15803D;">😈 Mood: Libertà!</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#E0F2FE; color:#0EA5E9;">🏖️</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 9:00 - 12:00</div>
+                    <div class="timeline-title">Relax Mode: ON</div>
+                    <div class="timeline-desc">Lettino, mare cristallino. Teresa pulisce il lettino prima di sedersi. Alessio si spalma la crema 50+ per la terza volta. Tiziano parte con un monologo su come il governo dovrebbe gestire le spiagge. Giuseppe corregge tutti. Sonia e' sparita: l'hanno vista dirigersi verso un negozietto. Sara nel frattempo ha organizzato i turni lettino su un foglio Excel.</div>
+                    <span class="timeline-mood" style="background:#E0F2FE; color:#0369A1;">😎 Mood: Pace interiore</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#FEE2E2; color:#DC2626;">🍝</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 12:30 - 14:00</div>
+                    <div class="timeline-title">Pranzo Pantagruelico</div>
+                    <div class="timeline-desc">Primo, secondo, contorno, dolce. Tutto calabrese, tutto devastante. Il buffet trema al nostro passaggio. Nessuno si alza prima di aver fatto il bis del bis.</div>
+                    <span class="timeline-mood" style="background:#FEE2E2; color:#B91C1C;">🤤 Mood: Food coma imminente</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#FCE7F3; color:#DB2777;">⚔️</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Durante il pranzo</div>
+                    <div class="timeline-title">Royal Rumble al Buffet</div>
+                    <div class="timeline-desc">Ilenia ruba il posto a Gaia. Gaia morde. Matteo lancia un grissino come un giavellotto. Ilenia piange per strategia. Gaia urla. Matteo ride e rilancia. I genitori fingono di essere turisti di un altro tavolo. Succede ogni giorno, identico, come un copione scritto dal caos.</div>
+                    <span class="timeline-mood" style="background:#FCE7F3; color:#9D174D;">🥊 Mood: WWE Kids Edition</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#EDE9FE; color:#7C3AED;">😴</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 14:00 - 16:00</div>
+                    <div class="timeline-title">La Sacra Pennichella</div>
+                    <div class="timeline-desc">Il momento più sacro della giornata. L'aria condizionata a palla, le tapparelle giù, il silenzio assoluto. Chi sveglia qualcuno, paga pegno.</div>
+                    <span class="timeline-mood" style="background:#EDE9FE; color:#6D28D9;">💤 Mood: Comatoso</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#DBEAFE; color:#2563EB;">🎪</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 16:00</div>
+                    <div class="timeline-title">Secondo Sgancio Bambini</div>
+                    <div class="timeline-desc">Round 2. I piccoli tornano in animazione carichi come molle. Gli animatori ormai ci riconoscono. Ci guardano con gli occhi di chi ha visto cose.</div>
+                    <span class="timeline-mood" style="background:#DCFCE7; color:#15803D;">🎉 Mood: Di nuovo liberi</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#CCFBF1; color:#0D9488;">🌊</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 16:00 - 19:00</div>
+                    <div class="timeline-title">Golden Hour dei Genitori</div>
+                    <div class="timeline-desc">Il pomeriggio scorre lento. Bagni al mare, aperitivo al bar, chiacchiere sul senso della vita. Il tramonto calabrese è uno spettacolo. Noi pure.</div>
+                    <span class="timeline-mood" style="background:#CCFBF1; color:#0F766E;">🥂 Mood: Aperitivo vibes</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#FEF3C7; color:#D97706;">🍽️</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 19:30 - 21:30</div>
+                    <div class="timeline-title">Cena: L'Evento Principale</div>
+                    <div class="timeline-desc">Se il pranzo era abbondante, la cena è epica. Antipasti calabresi, pasta fatta a mano, pesce freschissimo, dolci da lacrime. La cintura? Un ricordo.</div>
+                    <span class="timeline-mood" style="background:#FEF3C7; color:#A16207;">🤰 Mood: +3 kg</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#FDE68A; color:#B45309;">🍹</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 21:30 - 22:30</div>
+                    <div class="timeline-title">Cocktail, Chiacchiere & Sigarette</div>
+                    <div class="timeline-desc">I grandi al bar sotto le stelle. Tiziano al terzo Amaro del Capo cita Vannacci come se fosse un filosofo greco. Giuseppe lo corregge (ha ragione, ovviamente). Alessio googla "effetti collaterali Amaro del Capo". Teresa pulisce il tavolo con una salvietta. Sara propone di fare un sondaggio su dove cenare domani. Sonia mostra a tutti i suoi acquisti del pomeriggio.</div>
+                    <span class="timeline-mood" style="background:#FDE68A; color:#92400E;">🌙 Mood: Notti magiche</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#FEE2E2; color:#DC2626;">💥</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 22:30 - 23:00</div>
+                    <div class="timeline-title">Ritiro Bambini: La Resa dei Conti Finale</div>
+                    <div class="timeline-desc">I tre tornano dall'animazione trasformati: carichi di zucchero, adrenalina e rancore accumulato. Matteo tira uno schiaffo a Ilenia "per sbaglio". Ilenia risponde con un calcio "involontario". Gaia morde tutti e due "per difesa". I genitori provano a separare, negoziare, minacciare. Niente funziona. La battaglia dura 30 minuti esatti, ogni sera, con la precisione di un orologio svizzero.</div>
+                    <span class="timeline-mood" style="background:#FEE2E2; color:#B91C1C;">🥊 Mood: Fight Club - Round Finale</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#E0E7FF; color:#4338CA;">🚪</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 23:30</div>
+                    <div class="timeline-title">Rientro in Camera</div>
+                    <div class="timeline-desc">Tutti in stanza. I bambini crollano come sacchi di patate. I genitori si guardano con quegli occhi di chi ce l'ha fatta anche oggi.</div>
+                    <span class="timeline-mood" style="background:#E0E7FF; color:#3730A3;">😮‍💨 Mood: Missione compiuta</span>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot">
+                    <div class="dot-icon" style="background:#1E1B4B; color:#A78BFA;">🌙</div>
+                </div>
+                <div class="timeline-card">
+                    <div class="timeline-time">Ore 24:00</div>
+                    <div class="timeline-title">Nanna</div>
+                    <div class="timeline-desc">Sipario. Luci spente. Aria condizionata che culla. Domani si ricomincia. Stessa spiaggia, stesso mare, stessa meravigliosa follia.</div>
+                    <span class="timeline-mood" style="background:#1E1B4B; color:#C4B5FD;">💤 Mood: K.O. tecnico</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FIGHT CLUB DEI BAMBINI -->
+    <section class="fight-section" id="fightclub">
+        <div class="section-header reveal">
+            <span class="section-tag">Fight Club</span>
+            <h2 class="section-title">La Guerra dei Piccoli</h2>
+            <p class="section-desc">Prima regola del Fight Club in vacanza: non si parla del Fight Club. Seconda regola: i genitori fingono di non vedere.</p>
+        </div>
+
+        <!-- I TRE FIGHTERS -->
+        <div class="fighters-ring reveal">
+            <div class="fighter-card">
+                <img src="Foto Persone/Ilenia Alllegro.jpg" alt="Ilenia">
+                <div class="fighter-name">Ilenia Allegro</div>
+                <div class="fighter-alias">La Principessa Letale</div>
+                <div class="fighter-stats">
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Urla</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:95%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Schiaffi</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:80%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Pianto Tattico</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:100%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Innocenza Finta</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:90%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="fighter-card">
+                <img src="Foto Persone/Gaia Lauri.jpg" alt="Gaia">
+                <div class="fighter-name">Gaia Lauri</div>
+                <div class="fighter-alias">Tornado Biondo</div>
+                <div class="fighter-stats">
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Urla</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:85%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Morsi</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:70%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Pianto Tattico</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:88%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Velocita di Fuga</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:95%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vs-badge">VS</div>
+
+            <div class="fighter-card">
+                <img src="Foto Persone/Matteo Fanelli.jpg" alt="Matteo">
+                <div class="fighter-name">Matteo Fanelli</div>
+                <div class="fighter-alias">Il Piccolo Tyson</div>
+                <div class="fighter-stats">
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Urla</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:75%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Lancio Oggetti</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:100%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Pianto Tattico</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:60%"></div></div>
+                    </div>
+                    <div class="fighter-stat">
+                        <span class="fighter-stat-label">Forza Bruta</span>
+                        <div class="fighter-stat-bar"><div class="fighter-stat-fill" style="width:92%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCENE DI LOTTA -->
+        <div class="fight-scenes reveal">
+            <div class="fight-scene-card">
+                <img src="https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=600" alt="Lotta cuscini">
+                <div class="fight-scene-overlay">
+                    <div class="fight-scene-title">Ore 12:45 — La Battaglia del Buffet</div>
+                    <div class="fight-scene-desc">"Quel posto e' MIO!" — Ilenia, ogni singolo pranzo</div>
+                </div>
+            </div>
+            <div class="fight-scene-card">
+                <img src="https://images.unsplash.com/photo-1560328055-e938bb2ed50a?w=600" alt="Bambini che corrono">
+                <div class="fight-scene-overlay">
+                    <div class="fight-scene-title">Ore 22:35 — La Rissa della Buonanotte</div>
+                    <div class="fight-scene-desc">Zuccherati, stanchi, inarrestabili. Ogni sera. Senza eccezioni.</div>
+                </div>
+            </div>
+            <div class="fight-scene-card">
+                <img src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=600" alt="Wrestling bambini">
+                <div class="fight-scene-overlay">
+                    <div class="fight-scene-title">Ore 16:00 — Il Grissino Volante</div>
+                    <div class="fight-scene-desc">Matteo lancia. Gaia piange. Ilenia ride. I genitori ordinano un altro cocktail.</div>
+                </div>
+            </div>
+            <div class="fight-scene-card">
+                <img src="https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=600" alt="Bambini che giocano">
+                <div class="fight-scene-overlay">
+                    <div class="fight-scene-title">Ore 9:01 — Pace Temporanea</div>
+                    <div class="fight-scene-desc">L'unico momento di tregua. Dura circa 47 secondi.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REGOLE DEL FIGHT CLUB -->
+        <div class="fight-rules reveal">
+            <div class="fight-rule">
+                <span class="fight-rule-icon">1️⃣</span>
+                <span>Il primo che piange <b>non</b> ha necessariamente ragione. Probabilmente ha iniziato lui.</span>
+            </div>
+            <div class="fight-rule">
+                <span class="fight-rule-icon">2️⃣</span>
+                <span>I grissini <b>non</b> sono armi. Ma prova a spiegarlo a Matteo.</span>
+            </div>
+            <div class="fight-rule">
+                <span class="fight-rule-icon">3️⃣</span>
+                <span>Il posto a tavola non si sceglie, si <b>conquista</b>. Con la forza se necessario.</span>
+            </div>
+            <div class="fight-rule">
+                <span class="fight-rule-icon">4️⃣</span>
+                <span>I genitori intervengono solo sopra i 90 decibel. Sotto, e' "gioco".</span>
+            </div>
+            <div class="fight-rule">
+                <span class="fight-rule-icon">5️⃣</span>
+                <span>Dopo ogni battaglia, gelato per tutti. Perche' il gelato aggiusta tutto.</span>
+            </div>
+            <div class="fight-rule">
+                <span class="fight-rule-icon">6️⃣</span>
+                <span>Alle 23:00 scatta il coprifuoco. I bambini non lo sanno, ma i genitori ci sperano.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOD -->
+    <section class="food-section" id="food">
+        <div class="section-header reveal">
+            <span class="section-tag" style="color:var(--peperoncino);">Si Mangia!</span>
+            <h2 class="section-title">La Cucina Calabrese</h2>
+            <p class="section-desc" style="color:rgba(0,0,0,0.5);">Non è una vacanza, è un tour gastronomico con il mare come sfondo</p>
+        </div>
+        <div class="food-grid reveal">
+            <div class="food-card">
+                <img src="Foto Calabria/nduja_pizza_01.jpg" alt="Nduja">
+                <div class="food-card-body">
+                    <div class="food-card-title">'Nduja</div>
+                    <div class="food-card-desc">Il salame spalmabile che brucia l'anima</div>
+                    <div class="food-spicy">🌶️🌶️🌶️🌶️🌶️</div>
+                </div>
+            </div>
+            <div class="food-card">
+                <img src="Foto Calabria/pasta_01.jpg" alt="Pasta">
+                <div class="food-card-body">
+                    <div class="food-card-title">Fileja</div>
+                    <div class="food-card-desc">Pasta fatta a mano, sugo di cipolla rossa</div>
+                    <div class="food-spicy">🌶️🌶️</div>
+                </div>
+            </div>
+            <div class="food-card">
+                <img src="Foto Calabria/peperoncino_01.jpg" alt="Peperoncino">
+                <div class="food-card-body">
+                    <div class="food-card-title">Peperoncino</div>
+                    <div class="food-card-desc">Il re indiscusso della tavola calabrese</div>
+                    <div class="food-spicy">🌶️🌶️🌶️🌶️🌶️🌶️🌶️</div>
+                </div>
+            </div>
+            <div class="food-card">
+                <img src="Foto Calabria/salumi_01.jpg" alt="Salumi">
+                <div class="food-card-body">
+                    <div class="food-card-title">Salumi & Formaggi</div>
+                    <div class="food-card-desc">Soppressata, capocollo, caciocavallo...</div>
+                    <div class="food-spicy">🌶️🌶️🌶️</div>
+                </div>
+            </div>
+            <div class="food-card">
+                <img src="Foto Calabria/cibo_italiano_01.jpg" alt="Cibo">
+                <div class="food-card-body">
+                    <div class="food-card-title">Pesce Fresco</div>
+                    <div class="food-card-desc">Pescespada, tonno, alici, gamberi dello Ionio</div>
+                    <div class="food-spicy">🌶️</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="gallery-section" id="gallery">
+        <div class="section-header reveal">
+            <span class="section-tag">Gallery</span>
+            <h2 class="section-title">Cartoline dalla Calabria</h2>
+            <p class="section-desc">Paesaggi da togliere il fiato, facce da ricordare per sempre</p>
+        </div>
+        <div class="gallery-tabs reveal">
+            <button class="gallery-tab active" data-filter="all">Tutto</button>
+            <button class="gallery-tab" data-filter="paesaggi">Paesaggi</button>
+            <button class="gallery-tab" data-filter="cibo">Cibo</button>
+            <button class="gallery-tab" data-filter="resort">Resort</button>
+        </div>
+        <div class="gallery-grid reveal" id="galleryGrid">
+            <div class="gallery-item" data-cat="paesaggi" onclick="openLightbox(this)">
+                <img src="Foto Calabria/tropea_01.jpg" alt="Costa Calabra">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Costa Calabra</span></div>
+            </div>
+            <div class="gallery-item" data-cat="paesaggi" onclick="openLightbox(this)">
+                <img src="Foto Calabria/calabria_mare_01.jpg" alt="Mare Cristallino">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Mare Cristallino</span></div>
+            </div>
+            <div class="gallery-item" data-cat="paesaggi" onclick="openLightbox(this)">
+                <img src="Foto Calabria/tropea_02.jpg" alt="Spiaggia">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Spiaggia</span></div>
+            </div>
+            <div class="gallery-item" data-cat="cibo" onclick="openLightbox(this)">
+                <img src="Foto Calabria/grigliata_01.jpg" alt="Grigliata">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Grigliata Calabrese</span></div>
+            </div>
+            <div class="gallery-item" data-cat="paesaggi" onclick="openLightbox(this)">
+                <img src="Foto Calabria/calabria_sunset_01.jpg" alt="Tramonto">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Tramonto sullo Ionio</span></div>
+            </div>
+            <div class="gallery-item" data-cat="paesaggi" onclick="openLightbox(this)">
+                <img src="Foto Calabria/calabria_costa_01.jpg" alt="Costa">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">La Costa</span></div>
+            </div>
+            <div class="gallery-item" data-cat="resort" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/caption.jpg" alt="Resort">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Voi Floriana Resort</span></div>
+            </div>
+            <div class="gallery-item" data-cat="resort" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/classic.avif" alt="Resort Classic">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Il Villaggio</span></div>
+            </div>
+            <div class="gallery-item" data-cat="cibo" onclick="openLightbox(this)">
+                <img src="Foto Calabria/pasta_01.jpg" alt="Pasta">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Pasta Fatta a Mano</span></div>
+            </div>
+            <div class="gallery-item" data-cat="paesaggi" onclick="openLightbox(this)">
+                <img src="Foto Calabria/calabria_borgo_01.jpg" alt="Borgo">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Borgo Calabrese</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RESORT -->
+    <section class="resort-section" id="resort">
+        <div class="section-header reveal">
+            <span class="section-tag">Base Camp</span>
+            <h2 class="section-title">Il Quartier Generale</h2>
+            <p class="section-desc">La nostra casa per 7 giorni di pura follia organizzata</p>
+        </div>
+        <div class="resort-card reveal">
+            <div class="resort-img"></div>
+            <div class="resort-info">
+                <h3 class="resort-name">VOI Floriana Resort</h3>
+                <div class="resort-location">📍 Simeri Mare, Catanzaro (CZ)</div>
+                <ul class="resort-features">
+                    <li><span>🏖️</span> Spiaggia privata sullo Ionio</li>
+                    <li><span>🎪</span> Animazione Kids (aka Salvavita per Genitori)</li>
+                    <li><span>🍽️</span> Ristorante buffet All-Inclusive</li>
+                    <li><span>🏊</span> Piscina con vista mare</li>
+                    <li><span>🍹</span> Bar con cocktail fino a tarda sera</li>
+                    <li><span>🌴</span> Giardini tropicali & relax totale</li>
+                    <li><span>📅</span> 18 - 25 Luglio 2026</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAP -->
+    <section class="map-section" id="map-section">
+        <div class="section-header reveal">
+            <span class="section-tag">La Rotta</span>
+            <h2 class="section-title">Da Roma alla Calabria</h2>
+            <p class="section-desc">~500 km di autostrada, ma il bello inizia quando si vede il mare</p>
+        </div>
+        <div id="map" class="reveal"></div>
+    </section>
+
+    <!-- EXPLORE / CONSIGLI -->
+    <section class="explore-section" id="explore">
+        <div class="section-header reveal">
+            <span class="section-tag" style="color:var(--olive);">Da Esplorare</span>
+            <h2 class="section-title">Consigli: Cosa Vedere nei Dintorni</h2>
+            <p class="section-desc">Spiagge da sogno, borghi sospesi nel tempo e natura selvaggia a pochi km dal resort</p>
+        </div>
+        <div class="explore-filters reveal">
+            <button class="explore-filter active" data-xfilter="all">Tutti</button>
+            <button class="explore-filter" data-xfilter="spiaggia">🏖️ Spiagge</button>
+            <button class="explore-filter" data-xfilter="borgo">🏘️ Borghi</button>
+            <button class="explore-filter" data-xfilter="natura">🌿 Natura</button>
+            <button class="explore-filter" data-xfilter="cultura">🏛️ Cultura</button>
+            <button class="explore-filter" data-xfilter="avventura">🧗 Avventura</button>
+        </div>
+        <div class="explore-grid reveal" id="exploreGrid">
+
+            <!-- SPIAGGE -->
+            <div class="place-card" data-xcat="spiaggia">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600')">
+                    <span class="place-badge badge-spiaggia">🏖️ Spiaggia</span>
+                    <span class="place-distance">~22 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Spiaggia di Caminia</div>
+                    <div class="place-card-desc">Baia dorata incastonata tra due imponenti scogliere. Acqua turchese, scenari drammatici. Una delle spiagge più fotografate della Costa degli Aranci.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.6 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.76,16.56" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="spiaggia">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600')">
+                    <span class="place-badge badge-spiaggia">🏖️ Spiaggia</span>
+                    <span class="place-distance">~20 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Spiaggia di Copanello</div>
+                    <div class="place-card-desc">Caletta riparata tra scogliere nel Golfo di Squillace. Sabbia grossa, snorkeling eccellente. Conosciuta come "la Perla dello Ionio".</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.5 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.769,16.566" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="spiaggia">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1515859005217-8a1f08870f59?w=600')">
+                    <span class="place-badge badge-spiaggia">🏖️ Spiaggia</span>
+                    <span class="place-distance">~23 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Pietragrande (Montauro)</div>
+                    <div class="place-card-desc">Famosa per l'enorme roccia granitica che emerge dal mare. Sabbia fine, acqua cristallina. Un must assoluto per chi ama lo snorkeling.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.7 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.75,16.55" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="spiaggia">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=600')">
+                    <span class="place-badge badge-spiaggia">🏖️ Spiaggia</span>
+                    <span class="place-distance">~35 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Soverato</div>
+                    <div class="place-card-desc">La "Perla dello Ionio" — 3 km di sabbia fine, Bandiera Blu dal 2017. Riserva marina "Baia dell'Ippocampo". Vita notturna, ristoranti e gelati top.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.6 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.688,16.550" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="spiaggia">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?w=600')">
+                    <span class="place-badge badge-spiaggia">🏖️ Spiaggia</span>
+                    <span class="place-distance">~35 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Le Castella</div>
+                    <div class="place-card-desc">Spiaggia mozzafiato attorno a un castello aragonese su una penisola nel mare. Area marina protetta di Capo Rizzuto. Iconico e indimenticabile.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.8 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.907,17.023" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BORGHI -->
+            <div class="place-card" data-xcat="borgo">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1523528283115-9bf9b1699245?w=600')">
+                    <span class="place-badge badge-borgo">🏘️ Borgo</span>
+                    <span class="place-distance">~15 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Squillace</div>
+                    <div class="place-card-desc">Borgo medievale a 345m con castello normanno, rovine del monastero di Santa Chiara e botteghe di ceramica artigianale. Una tradizione dalla Magna Grecia.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.4 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.78,16.52" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="borgo">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600')">
+                    <span class="place-badge badge-borgo">🏘️ Borgo</span>
+                    <span class="place-distance">~30 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Taverna</div>
+                    <div class="place-card-desc">Paese di montagna (552m) ai piedi della Sila. Patria del pittore barocco Mattia Preti, il "Caravaggio Calabrese". Museo civico con capolavori imperdibili.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.3 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=39.021,16.579" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="borgo">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1552751753-0fc84ae5b6c8?w=600')">
+                    <span class="place-badge badge-borgo">🏘️ Borgo</span>
+                    <span class="place-distance">~15 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">San Floro</div>
+                    <div class="place-card-desc">Villaggio di 680 abitanti con vista sul Golfo. Famoso per la tradizione della seta: il Museo della Seta è un'esperienza interattiva unica nel suo genere.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.5 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.85,16.55" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NATURA -->
+            <div class="place-card" data-xcat="natura">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1432405972618-c6b0cfba8b67?w=600')">
+                    <span class="place-badge badge-natura">🌿 Natura</span>
+                    <span class="place-distance">~35 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Riserva Valli Cupe</div>
+                    <div class="place-card-desc">Uno dei segreti naturalistici meglio custoditi d'Europa! Canyon spettacolare, decine di cascate, flora rarissima. Escursioni guidate disponibili. Da non perdere.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.9 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=39.01,16.72" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="natura">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1544085311-11a028465b03?w=600')">
+                    <span class="place-badge badge-natura">🌿 Natura</span>
+                    <span class="place-distance">~30 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Cascata del Campanaro</div>
+                    <div class="place-card-desc">Cascata di 22 metri nella riserva Valli Cupe. Le alghe rosse testimoniano la purezza dell'acqua. Un angolo di paradiso nascosto nella montagna calabrese.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.7 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=39.01,16.71" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="natura">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600')">
+                    <span class="place-badge badge-natura">🌿 Natura</span>
+                    <span class="place-distance">~50 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Parco Nazionale della Sila</div>
+                    <div class="place-card-desc">70.000 ettari di laghi, foreste e montagne. Cinghiali, lupi, cervi. La Sila Piccola è la zona più vicina — perfetta per una gita di un giorno dal mare.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.8 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=39.15,16.53" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CULTURA -->
+            <div class="place-card" data-xcat="cultura">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600')">
+                    <span class="place-badge badge-cultura">🏛️ Cultura</span>
+                    <span class="place-distance">~15 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Parco Archeologico di Scolacium</div>
+                    <div class="place-card-desc">Rovine della colonia greca Skylletion in un uliveto secolare di 35 ettari. Foro romano, teatro, anfiteatro e la basilica normanna di Santa Maria della Roccella. Ospita concerti estivi!</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.7 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.809,16.596" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="place-card" data-xcat="cultura">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1569930784237-ea65a702c65f?w=600')">
+                    <span class="place-badge badge-cultura">🏛️ Cultura</span>
+                    <span class="place-distance">~35 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Castello Aragonese di Le Castella</div>
+                    <div class="place-card-desc">Fortezza del XV secolo su una penisola che si tuffa nel turchese dello Ionio. Dentro l'Area Marina Protetta di Capo Rizzuto. Lo spot più iconico della Calabria.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.8 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.907,17.023" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AVVENTURA -->
+            <div class="place-card" data-xcat="avventura">
+                <div class="place-card-img" style="background-image:url('https://images.unsplash.com/photo-1551632811-561732d1e306?w=600')">
+                    <span class="place-badge badge-avventura">🧗 Avventura</span>
+                    <span class="place-distance">~20 km</span>
+                </div>
+                <div class="place-card-body">
+                    <div class="place-card-title">Sellia — Borgo Avventura</div>
+                    <div class="place-card-desc">Il primo "Borgo Avventura" d'Europa! Zipline da 500m sopra il borgo, ponte tibetano da 130m, percorsi di arrampicata e torre di lancio da 15m. Panorama mozzafiato sul Golfo di Squillace.</div>
+                    <div class="place-card-footer">
+                        <span class="place-rating">⭐ 4.6 / 5</span>
+                        <a class="place-maps-btn" href="https://www.google.com/maps/search/?api=1&query=38.984,16.625" target="_blank">📍 Maps</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- COUNTDOWN / QUOTE -->
+    <section class="quote-section">
+        <div class="reveal">
+            <p class="quote-text">"In Calabria non si va in vacanza. Si va a vivere."</p>
+            <div style="opacity:0.4; font-size:0.9rem; margin-top:8px;">- La Ciurma, probabilmente dopo il terzo Amaro del Capo</div>
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-value" id="days">--</div>
+                    <div class="countdown-label">Giorni</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="hours">--</div>
+                    <div class="countdown-label">Ore</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="minutes">--</div>
+                    <div class="countdown-label">Minuti</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="seconds">--</div>
+                    <div class="countdown-label">Secondi</div>
+                </div>
+            </div>
+            <div style="margin-top:16px; opacity:0.4; font-size:0.85rem;">alla partenza!</div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-icons">🌊 🌶️ ☀️ 🍝 🏖️</div>
+        <p>Calabria 2026 &mdash; Allegro &bull; Lauri &bull; Fanelli</p>
+        <p style="margin-top:6px; font-size:0.75rem; opacity:0.5;">Made with ❤️ e tanta 'nduja</p>
+    </footer>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <a href="#top"><span>🏠</span>Home</a>
+        <a href="#crew"><span>👨‍👩‍👧</span>Famiglie</a>
+        <a href="#viaggio"><span>🚗</span>Viaggio</a>
+        <a href="#routine"><span>⏰</span>Giornata</a>
+        <a href="#food"><span>🍝</span>Cibo</a>
+        <a href="#explore"><span>🗺️</span>Consigli</a>
+        <a href="#gallery"><span>📸</span>Gallery</a>
+    </nav>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close">&times;</button>
+        <img id="lightbox-img" src="" alt="">
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // === REVEAL ON SCROLL ===
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // === LIGHTBOX ===
+        function openLightbox(el) {
+            const img = el.querySelector('img');
+            document.getElementById('lightbox-img').src = img.src;
+            document.getElementById('lightbox').classList.add('open');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('open');
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // === GALLERY FILTER ===
+        document.querySelectorAll('.gallery-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.gallery-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const filter = tab.dataset.filter;
+                document.querySelectorAll('.gallery-item').forEach(item => {
+                    if (filter === 'all' || item.dataset.cat === filter) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // === EXPLORE FILTER ===
+        document.querySelectorAll('.explore-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.explore-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.xfilter;
+                document.querySelectorAll('.place-card').forEach(card => {
+                    if (filter === 'all' || card.dataset.xcat === filter) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // === COUNTDOWN ===
+        function updateCountdown() {
+            const target = new Date('2026-07-18T06:00:00');
+            const now = new Date();
+            const diff = target - now;
+
+            if (diff <= 0) {
+                document.getElementById('days').textContent = '🎉';
+                document.getElementById('hours').textContent = 'SI';
+                document.getElementById('minutes').textContent = 'VA!';
+                document.getElementById('seconds').textContent = '🌊';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // === MAP ===
+        const map = L.map('map').setView([39.15, 16.0], 7);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO'
+        }).addTo(map);
+
+        // Roma
+        const roma = [41.8719, 12.6365];
+        // Simeri Mare
+        const simeri = [38.8833, 16.6667];
+        // Catanzaro (stazione)
+        const catanzaro = [38.9098, 16.5879];
+
+        // Markers
+        L.marker(roma).addTo(map).bindPopup('<b>🏠 Roma Borghesiana</b><br>Punto di partenza');
+        L.marker(simeri).addTo(map).bindPopup('<b>🏖️ VOI Floriana Resort</b><br>Simeri Mare');
+        L.marker(catanzaro).addTo(map).bindPopup('<b>🚆 Catanzaro</b><br>Arrivo Famiglia Fanelli');
+
+        // Route lines
+        const autoRoute = [
+            roma,
+            [41.46, 13.83], // Cassino area
+            [40.85, 14.27], // Napoli area
+            [40.35, 15.48], // Sala Consilina
+            [39.48, 16.25], // Cosenza area
+            simeri
+        ];
+
+        const trainRoute = [
+            roma,
+            [41.12, 14.78], // Caserta
+            [40.85, 14.27], // Napoli
+            [40.63, 14.60], // Salerno
+            [39.48, 16.25], // Cosenza
+            catanzaro
+        ];
+
+        L.polyline(autoRoute, {
+            color: '#FF6B35',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: null
+        }).addTo(map).bindPopup('🚗 Famiglia Allegro & Lauri<br>Roma → Simeri Mare (8h)');
+
+        L.polyline(trainRoute, {
+            color: '#7C3AED',
+            weight: 4,
+            opacity: 0.8,
+            dashArray: '10, 10'
+        }).addTo(map).bindPopup('🚆 Famiglia Fanelli<br>Roma → Catanzaro (treno)');
+
+        // POI markers
+        const poiIcon = (emoji) => L.divIcon({
+            html: `<div style="font-size:1.4rem;text-align:center;line-height:1;">${emoji}</div>`,
+            iconSize: [28, 28],
+            className: ''
+        });
+
+        const pois = [
+            { pos: [38.76, 16.56], name: 'Spiaggia di Caminia', icon: '🏖️' },
+            { pos: [38.769, 16.566], name: 'Copanello', icon: '🏖️' },
+            { pos: [38.75, 16.55], name: 'Pietragrande', icon: '🏖️' },
+            { pos: [38.688, 16.550], name: 'Soverato', icon: '🏖️' },
+            { pos: [38.907, 17.023], name: 'Le Castella', icon: '🏰' },
+            { pos: [38.78, 16.52], name: 'Squillace', icon: '🏘️' },
+            { pos: [39.021, 16.579], name: 'Taverna', icon: '🎨' },
+            { pos: [38.85, 16.55], name: 'San Floro', icon: '🧵' },
+            { pos: [39.01, 16.72], name: 'Valli Cupe', icon: '🌿' },
+            { pos: [38.984, 16.625], name: 'Sellia Borgo Avventura', icon: '🧗' },
+            { pos: [38.809, 16.596], name: 'Parco Scolacium', icon: '🏛️' },
+        ];
+
+        pois.forEach(p => {
+            L.marker(p.pos, { icon: poiIcon(p.icon) }).addTo(map)
+                .bindPopup(`<b>${p.icon} ${p.name}</b>`);
+        });
+
+        // Fit bounds
+        map.fitBounds([roma, simeri], { padding: [40, 40] });
+
+        // === ACTIVE NAV ===
+        const navLinks = document.querySelectorAll('.bottom-nav a');
+        window.addEventListener('scroll', () => {
+            const scrollPos = window.scrollY + 200;
+            document.querySelectorAll('section[id]').forEach(section => {
+                if (section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
+                    const id = section.getAttribute('id');
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
