@@ -1177,7 +1177,7 @@
 
         .resort-card {
             max-width: 900px;
-            margin: 0 auto;
+            margin: 0 auto 40px;
             background: white;
             border-radius: 28px;
             overflow: hidden;
@@ -1187,7 +1187,7 @@
         }
 
         .resort-img {
-            background: url('Foto Villaggio/caption.jpg') center/cover no-repeat;
+            background: url('Foto Villaggio/resort_aerea.jpg') center/cover no-repeat;
             min-height: 350px;
         }
 
@@ -1231,6 +1231,62 @@
 
         .resort-features li span {
             font-size: 1.2rem;
+        }
+
+        .resort-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 200px 200px;
+            gap: 12px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .resort-gallery-item {
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .resort-gallery-item:hover {
+            transform: scale(1.03);
+            z-index: 2;
+        }
+
+        .resort-gallery-item:nth-child(1) { grid-column: span 2; }
+        .resort-gallery-item:nth-child(5) { grid-column: span 2; }
+
+        .resort-gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .resort-gallery-item:hover img { transform: scale(1.08); }
+
+        .resort-gallery-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 14px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .resort-gallery-item:hover .resort-gallery-label { opacity: 1; }
+
+        @media (max-width: 768px) {
+            .resort-gallery { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+            .resort-gallery-item:nth-child(1),
+            .resort-gallery-item:nth-child(5) { grid-column: span 2; }
         }
 
         /* ===== COUNTDOWN / QUOTE ===== */
@@ -2302,31 +2358,31 @@
         <!-- SCENE DI LOTTA -->
         <div class="fight-scenes reveal">
             <div class="fight-scene-card">
-                <img src="https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=600" alt="Lotta cuscini">
+                <img src="Foto Bambini/IMG20251121204154.jpg" alt="La banda al completo">
                 <div class="fight-scene-overlay">
-                    <div class="fight-scene-title">Ore 12:45 — La Battaglia del Buffet</div>
-                    <div class="fight-scene-desc">"Quel posto e' MIO!" — Ilenia, ogni singolo pranzo</div>
+                    <div class="fight-scene-title">La Banda al Completo</div>
+                    <div class="fight-scene-desc">Sorridono, ma non fatevi ingannare. Stanno pianificando il prossimo attacco.</div>
                 </div>
             </div>
             <div class="fight-scene-card">
-                <img src="https://images.unsplash.com/photo-1560328055-e938bb2ed50a?w=600" alt="Bambini che corrono">
+                <img src="Foto Bambini/IMG_20251107_151654.jpg" alt="Tregua armata">
                 <div class="fight-scene-overlay">
-                    <div class="fight-scene-title">Ore 22:35 — La Rissa della Buonanotte</div>
-                    <div class="fight-scene-desc">Zuccherati, stanchi, inarrestabili. Ogni sera. Senza eccezioni.</div>
+                    <div class="fight-scene-title">Ore 9:01 — Tregua Armata</div>
+                    <div class="fight-scene-desc">Abbracci e sorrisi. Durera' esattamente 47 secondi, poi il caos.</div>
                 </div>
             </div>
             <div class="fight-scene-card">
-                <img src="https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=600" alt="Wrestling bambini">
+                <img src="Foto Bambini/IMG_20250914_195001.jpg" alt="Le due complici">
                 <div class="fight-scene-overlay">
-                    <div class="fight-scene-title">Ore 16:00 — Il Grissino Volante</div>
-                    <div class="fight-scene-desc">Matteo lancia. Gaia piange. Ilenia ride. I genitori ordinano un altro cocktail.</div>
+                    <div class="fight-scene-title">Le Due Complici in Spiaggia</div>
+                    <div class="fight-scene-desc">Ilenia e Gaia. Alleate quando conviene, nemiche giurate per il lettino.</div>
                 </div>
             </div>
             <div class="fight-scene-card">
-                <img src="https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=600" alt="Bambini che giocano">
+                <img src="Foto Bambini/IMG20250914005343.jpg" alt="K.O. totale">
                 <div class="fight-scene-overlay">
-                    <div class="fight-scene-title">Ore 9:01 — Pace Temporanea</div>
-                    <div class="fight-scene-desc">L'unico momento di tregua. Dura circa 47 secondi.</div>
+                    <div class="fight-scene-title">Ore 23:30 — K.O. Tecnico</div>
+                    <div class="fight-scene-desc">Dopo la battaglia finale, crollano tutti e tre. I genitori possono finalmente respirare.</div>
                 </div>
             </div>
         </div>
@@ -2450,11 +2506,19 @@
                 <div class="gallery-item-overlay"><span class="gallery-item-label">La Costa</span></div>
             </div>
             <div class="gallery-item" data-cat="resort" onclick="openLightbox(this)">
-                <img src="Foto Villaggio/caption.jpg" alt="Resort">
-                <div class="gallery-item-overlay"><span class="gallery-item-label">Voi Floriana Resort</span></div>
+                <img src="Foto Villaggio/resort_aerea.jpg" alt="Resort Aerea">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Voi Floriana Resort - Vista Aerea</span></div>
             </div>
             <div class="gallery-item" data-cat="resort" onclick="openLightbox(this)">
-                <img src="Foto Villaggio/classic.avif" alt="Resort Classic">
+                <img src="Foto Villaggio/resort_piscina.jpg" alt="Piscina">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">La Piscina</span></div>
+            </div>
+            <div class="gallery-item" data-cat="resort" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_spiaggia.jpg" alt="Spiaggia Resort">
+                <div class="gallery-item-overlay"><span class="gallery-item-label">Spiaggia Privata</span></div>
+            </div>
+            <div class="gallery-item" data-cat="resort" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_esterno.jpg" alt="Resort Esterno">
                 <div class="gallery-item-overlay"><span class="gallery-item-label">Il Villaggio</span></div>
             </div>
             <div class="gallery-item" data-cat="cibo" onclick="openLightbox(this)">
@@ -2486,9 +2550,45 @@
                     <li><span>🍽️</span> Ristorante buffet All-Inclusive</li>
                     <li><span>🏊</span> Piscina con vista mare</li>
                     <li><span>🍹</span> Bar con cocktail fino a tarda sera</li>
-                    <li><span>🌴</span> Giardini tropicali & relax totale</li>
+                    <li><span>🌴</span> 13 ettari di giardini con buganville</li>
                     <li><span>📅</span> 18 - 25 Luglio 2026</li>
                 </ul>
+            </div>
+        </div>
+
+        <!-- GALLERY RESORT -->
+        <div class="resort-gallery reveal">
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_panoramica.jpg" alt="Vista panoramica">
+                <div class="resort-gallery-label">Vista Panoramica</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_piscina.jpg" alt="Piscina">
+                <div class="resort-gallery-label">Piscina</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_spiaggia.jpg" alt="Spiaggia">
+                <div class="resort-gallery-label">Spiaggia Privata</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_giardino.jpg" alt="Giardini">
+                <div class="resort-gallery-label">Giardini & Buganville</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_ristorante.jpg" alt="Ristorante">
+                <div class="resort-gallery-label">Ristorante</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/camera_classic.jpg" alt="Camera Classic">
+                <div class="resort-gallery-label">Camera Classic</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/camera_family.jpg" alt="Camera Family">
+                <div class="resort-gallery-label">Camera Family</div>
+            </div>
+            <div class="resort-gallery-item" onclick="openLightbox(this)">
+                <img src="Foto Villaggio/resort_animazione.jpg" alt="Animazione">
+                <div class="resort-gallery-label">Area Animazione</div>
             </div>
         </div>
     </section>
