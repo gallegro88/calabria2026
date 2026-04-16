@@ -1653,9 +1653,13 @@
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-		<audio autoplay loop>
+		<audio id="bg-music" loop>
 		  <source src="calabrisella.mp3" type="audio/mpeg">
 		</audio>
+		<audio id="bg-music" loop>
+		  <source src="calabrisella.mp3" type="audio/mpeg">
+		</audio>
+
             <div class="hero-badge">☀️ 18 - 25 Luglio 2026</div>
             <h1 class="hero-title">
                 Calabria
@@ -3074,6 +3078,12 @@
                 }
             });
         });
+		
+		document.addEventListener("click", function () {
+		  const audio = document.getElementById("bg-music");
+		  audio.volume = 0.2;
+		  audio.play();
+		}, { once: true });
     </script>
 </body>
 </html>
